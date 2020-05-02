@@ -3,7 +3,7 @@ const server = new express();
 const http = require("http").Server(server);
 const socketio = require("socket.io")(http);
 
-server.use(express.static("public"));
+server.use(express.static("client/dist"));
 
 socketio.on("connection", socket => {
     socket.on("loadPlayers", loadPlayers);
