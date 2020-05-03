@@ -1,9 +1,7 @@
 const express = require("express");
-const server = new express();
-const http = require("http").Server(server);
+const app = express();
+const http = require("http").Server(app);
 const socketio = require("socket.io")(http);
-
-server.use(express.static("client/dist"));
 
 socketio.on("connection", socket => {
     socket.on("loadPlayers", loadPlayers);
@@ -11,6 +9,8 @@ socketio.on("connection", socket => {
     socket.on("sendMessage", sendMessage);
     socket.on("loadChatHistory", loadChatHistory);
 });
+
+const appPort = process.env.PORT || 3000;
 
 const loadPlayers = () => {
     const players = [
@@ -103,6 +103,6 @@ const loadChatHistory = () => {
     socketio.emit("chatHistoryLoaded", chatHistory);
 }
 
-http.listen(3000, () => {
-    console.log("Listening at :3000...");
+app.listen(appPort, () => {
+    console.log(`App running at port ${appPort}/`);
 });
