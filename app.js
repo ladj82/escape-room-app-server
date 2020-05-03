@@ -1,5 +1,4 @@
-const express = require("express");
-const app = express();
+const app = require("express")();
 const http = require("http").Server(app);
 const socketio = require("socket.io")(http);
 
@@ -103,6 +102,6 @@ const loadChatHistory = () => {
     socketio.emit("chatHistoryLoaded", chatHistory);
 }
 
-app.listen(appPort, () => {
+http.listen(appPort, () => {
     console.log(`App running at port ${appPort}/`);
 });
