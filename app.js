@@ -1,18 +1,23 @@
-const app = require("express")();
+const express = require("express");
+const socketIO = require("socket.io");
 const serveStatic = require("serve-static");
-const socketIO = require("socket.io")(app);
+
 const appPort = process.env.PORT || 3000;
 
-app.use(serveStatic(__dirname + "/public/dist"));
-app.listen(appPort, () => {
-    console.log(`App running at port ${appPort}/`);
-});
+const server = express()
+    .use(serveStatic(__dirname + "/public/dist"))
+    .listen(appPort, () => {
+        console.log(`App running at port ${appPort}`);
+    });
 
-socketIO.on("connection", socket => {
+const io = socketIO(server);
+
+io.on("connection", socket => {
     socket.on("loadPlayers", loadPlayers);
     socket.on("movePlayer", movePlayer);
     socket.on("sendMessage", sendMessage);
     socket.on("loadChatHistory", loadChatHistory);
+    socket.on('disconnect', () => console.log("Client disconnected"));
 });
 
 const loadPlayers = () => {
@@ -39,7 +44,7 @@ const loadPlayers = () => {
         }
     ];
 
-    socketIO.emit("playersLoaded", players);
+    io.emit("playersLoaded", players);
 };
 
 const movePlayer = (payload) => {
@@ -62,7 +67,7 @@ const movePlayer = (payload) => {
 
     }
 
-    socketIO.emit("playerMoved", player);
+    io.emit("playerMoved", player);
 };
 
 const movePlayerByKeyboard = (player, direction) => {
@@ -98,11 +103,11 @@ const movePlayerByCoordinates = (player, coordinates) => {
 const chatHistory = [];
 
 const sendMessage = (payload) => {
-    socketIO.emit("messageLoaded", payload);
+    io.emit("messageLoaded", payload);
     chatHistory.push(payload);
 }
 
 const loadChatHistory = () => {
-    socketIO.emit("chatHistoryLoaded", chatHistory);
+    io.emit("chatHistoryLoaded", chatHistory);
 }
 
